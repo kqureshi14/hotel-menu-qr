@@ -33,13 +33,16 @@ export default function App() {
 
   const items = Object.values(cart);
 
+
+  const WHATSAPP_NUMBER = "923000204168";
+
   const message = `
 Room ${room}
 Order:
 ${items.map((i) => `${i.qty}x ${i.name}`).join("\n")}
 `.trim();
 
-  const whatsappUrl = `https://wa.me/923001234567?text=${encodeURIComponent(
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
     message
   )}`;
 
