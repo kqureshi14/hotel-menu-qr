@@ -8,6 +8,7 @@ export default function App() {
   }, []);
 
   const [cart, setCart] = useState({});
+  const [cartOpen, setCartOpen] = useState(false);
 
   const addItem = (item) => {
     setCart((prev) => ({
@@ -22,6 +23,8 @@ export default function App() {
   const removeItem = (id) => {
     setCart((prev) => {
       const updated = { ...prev };
+      if (!updated[id]) return prev;
+
       if (updated[id].qty > 1) {
         updated[id].qty -= 1;
       } else {
@@ -32,7 +35,6 @@ export default function App() {
   };
 
   const items = Object.values(cart);
-
 
   const WHATSAPP_NUMBER = "923000204168";
 
@@ -47,7 +49,7 @@ ${items.map((i) => `${i.qty}x ${i.name}`).join("\n")}
   )}`;
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-28">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <header className="bg-hotel text-white px-6 py-5 rounded-b-3xl shadow">
         <h1 className="text-xl font-semibold tracking-wide">Hotel Hillview</h1>
@@ -70,7 +72,7 @@ ${items.map((i) => `${i.qty}x ${i.name}`).join("\n")}
       </div>
 
       {/* Menu */}
-      <main className="max-w-xl mx-auto px-4 space-y-10 mt-6">
+      <main className="max-w-xl mx-auto px-4 space-y-10 mt-6 pb-24">
         {menuData.map((category) => (
           <section
             key={category.category}
@@ -107,51 +109,83 @@ ${items.map((i) => `${i.qty}x ${i.name}`).join("\n")}
         </p>
       </main>
 
+      {/* Floating Cart Button */}
       {items.length > 0 && (
-        <div className="max-w-xl mx-auto px-4 mt-6">
-          <div className="bg-white rounded-xl border shadow-sm p-4 space-y-3">
-            <h3 className="font-semibold text-gray-800">Your Order</h3>
-
-            {items.map((item) => (
-              <div key={item.id} className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm font-medium">{item.name}</p>
-                  <p className="text-xs text-gray-500">PKR {item.price}</p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="w-7 h-7 rounded-full border text-sm"
-                  >
-                    −
-                  </button>
-                  <span className="w-6 text-center text-sm">{item.qty}</span>
-                  <button
-                    onClick={() => addItem(item)}
-                    className="w-7 h-7 rounded-full border text-sm"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <button
+          onClick={() => setCartOpen(true)}
+          className="fixed bottom-5 right-5 z-50 bg-accent text-white rounded-full px-5 py-3 shadow-lg flex items-center gap-2"
+        >
+          🛒
+          <span className="bg-white text-accent text-xs font-semibold rounded-full px-2 py-0.5">
+            {items.length}
+          </span>
+        </button>
       )}
 
-      {/* Sticky Cart */}
-      {items.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
-          <div className="max-w-xl mx-auto px-4 py-4 flex justify-between items-center">
-            <span className="font-medium">{items.length} item(s) selected</span>
+      {/* Cart Drawer */}
+      {cartOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40">
+          <div className="fixed right-0 top-0 h-full w-80 bg-white shadow-xl p-4 flex flex-col">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h3 className="text-lg font-semibold">Your Order</h3>
+                <p className="text-xs text-gray-500">Room {room}</p>
+              </div>
+              <button
+                onClick={() => setCartOpen(false)}
+                className="text-gray-500 text-xl"
+              >
+                ×
+              </button>
+            </div>
 
+            {/* Items */}
+            <div className="flex-1 overflow-y-auto space-y-3">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex justify-between items-center"
+                >
+                  <div>
+                    <p className="text-sm font-medium">{item.name}</p>
+                    <p className="text-xs text-gray-500">
+                      PKR {item.price}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="w-7 h-7 rounded-full border text-sm"
+                    >
+                      −
+                    </button>
+                    <span className="w-6 text-center text-sm">
+                      {item.qty}
+                    </span>
+                    <button
+                      onClick={() => addItem(item)}
+                      className="w-7 h-7 rounded-full border text-sm"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer */}
             <a
               href={whatsappUrl}
-              className="bg-green-600 text-white px-6 py-2 rounded-full font-medium"
+              className="mt-4 bg-green-600 text-white py-3 rounded-full text-center font-medium"
             >
               Place Order
             </a>
+
+            <p className="text-xs text-gray-400 text-center mt-2">
+              Bill will be settled at checkout
+            </p>
           </div>
         </div>
       )}
